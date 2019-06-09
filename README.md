@@ -1,3 +1,5 @@
+# 参考 https://github.com/sfyc23/EverydayWechat 所做的自我配置
+
 ![python_vesion](https://img.shields.io/badge/Python%20-%3E%3D%203.6-green.svg)  
 # 用 Python + itchat 写一个爬虫脚本每天定时给多个女友发给微信暖心话
 
