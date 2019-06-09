@@ -1,0 +1,31 @@
+# 配置文件请严格遵循yaml语法格式，yaml学习地址:
+#  https://ansible-tran.readthedocs.io/en/latest/docs/YAMLSyntax.html
+#  http://einverne.github.io/post/2015/08/yaml.html
+
+# 定时时间
+alarm_timed: '23:58'
+
+# 格言渠道
+# 1 : ONE●一个
+# 2 : 词霸（每日英语，双语）
+# 3 : 土味情话
+dictum_channel: 1
+
+girlfriend_infos:
+#  -
+#    #女友微信昵称
+#    wechat_name: '蕊宝'
+#    #女友所在地址
+#    city_name: '海淀区'
+#    # 从那天开始勾搭的（可空）
+#    start_date: '2019-06-06'
+#    # 短句的最后留言（可空）
+#    sweet_words: '来自最爱你的田老师。'
+
+  #如果你有多个人需要发送，则参照这个样式，复制即可
+  #如不需要，则删除或注解下面所有的数据
+  -
+    wechat_name: 'Chaunhewie Tian'
+    city_name: '海淀区'
+    start_date: '2019-06-06'
+    sweet_words: '来自自己测试。'
