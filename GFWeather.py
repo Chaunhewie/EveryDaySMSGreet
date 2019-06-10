@@ -18,7 +18,8 @@ class GFWeather:
     dictum_channel_name = {1: 'ONE●一个', 2: '词霸(每日英语)', 3: '土味情话'}
 
     def __init__(self):
-        self.girlfriend_list, self.alarm_hour, self.alarm_minute, self.dictum_channel = self.get_init_data()
+        self.girlfriend_list, self.alarm_hours, self.alarm_minutes, self.dictum_channels = self.get_init_data()
+        self.dictum_channel_index = 1
 
     def get_init_data(self):
         '''
@@ -27,12 +28,18 @@ class GFWeather:
         '''
         with open('_config.yaml', 'r', encoding='utf-8') as f:
             config = yaml.load(f, Loader=yaml.Loader)
+        morning_alarm_timed = config.get('morning_alarm_timed').strip()
+        afternoon_alarm_timed = config.get('afternoon_alarm_timed').strip()
+        evening_alarm_timed = config.get('evening_alarm_timed').strip()
 
-        alarm_timed = config.get('alarm_timed').strip()
-        init_msg = f"每天定时发送时间：{alarm_timed}\n"
-
-        dictum_channel = config.get('dictum_channel', -1)
-        init_msg += f"格言获取渠道：{self.dictum_channel_name.get(dictum_channel, '无')}\n"
+        init_msg = f"每天定时发送时间：早-{morning_alarm_timed}, 中-{afternoon_alarm_timed}, 晚-{evening_alarm_timed}\n"
+        morning_dictum_channel = config.get('morning_dictum_channel', -1)
+        afternoon_dictum_channel = config.get('afternoon_dictum_channel', -1)
+        evening_dictum_channel = config.get('evening_dictum_channel', -1)
+        dictum_channels = [morning_dictum_channel, afternoon_dictum_channel, evening_dictum_channel]
+        init_msg += f"格言获取渠道：早-{self.dictum_channel_name.get(morning_dictum_channel, '无')}, 中-" \
+                    f"{self.dictum_channel_name.get(afternoon_dictum_channel, '无')}, 晚-" \
+                    f"{self.dictum_channel_name.get(evening_dictum_channel, '无')}\n"
 
         girlfriend_list = []
         girlfriend_infos = config.get('girlfriend_infos')
@@ -54,8 +61,19 @@ class GFWeather:
         print(u"*" * 50)
         print(init_msg)
 
-        hour, minute = [int(x) for x in alarm_timed.split(':')]
-        return girlfriend_list, hour, minute, dictum_channel
+        hours = []
+        minutes = []
+        hour, minute = [int(x) for x in morning_alarm_timed.split(':')]
+        hours.append(hour)
+        minutes.append(minute)
+        hour, minute = [int(x) for x in afternoon_alarm_timed.split(':')]
+        hours.append(hour)
+        minutes.append(minute)
+        hour, minute = [int(x) for x in evening_alarm_timed.split(':')]
+        hours.append(hour)
+        minutes.append(minute)
+
+        return girlfriend_list, hours, minutes, dictum_channels
 
     def is_online(self, auto_login=False):
         '''
@@ -107,19 +125,24 @@ class GFWeather:
             return
         for girlfriend in self.girlfriend_list:
             wechat_name = girlfriend.get('wechat_name')
-            friends = itchat.search_friends(name=wechat_name)
+            wechat_account = girlfriend.get('wechatAccount')
+            print("搜索：", girlfriend.get("wechat_name"))
+            friends = itchat.search_friends(name=wechat_name, wechatAccount=wechat_account)
             if not friends:
                 print('昵称有误')
                 return
             name_uuid = friends[0].get('UserName')
             girlfriend['name_uuid'] = name_uuid
+            print(str(name_uuid))
 
         # 定时任务
         scheduler = BlockingScheduler()
-        # 每天9：30左右给女朋友发送每日一句
-        scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hour, minute=self.alarm_minute)
-        # 每隔 2 分钟发送一条数据用于测试。
-        # scheduler.add_job(self.start_today_info, 'interval', seconds=120)
+        # 每天定时给女朋友发送每日一句
+        scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hours[0], minute=self.alarm_minutes[0])
+        scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hours[1], minute=self.alarm_minutes[1])
+        scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hours[2], minute=self.alarm_minutes[2])
+        # 每隔 30 秒发送一条数据用于测试。
+        scheduler.add_job(self.start_today_info, 'interval', seconds=30)
         scheduler.start()
 
     def start_today_info(self, is_test=False):
@@ -130,18 +153,18 @@ class GFWeather:
         '''
         print("*" * 50)
         print('获取相关信息...')
-
-        if self.dictum_channel == 1:
+        dictum_channel = self.dictum_channels[self.dictum_channel_index]
+        if dictum_channel == 1:
             dictum_msg = self.get_dictum_info()
-        elif self.dictum_channel == 2:
+        elif dictum_channel == 2:
             dictum_msg = self.get_ciba_info()
-        elif self.dictum_channel == 3:
+        elif dictum_channel == 3:
             dictum_msg = self.get_lovelive_info()
         else:
             dictum_msg = ''
-        self.dictum_channel += 1
-        if self.dictum_channel > 3:
-            self.dictum_channel = 1
+        self.dictum_channel_index += 1
+        if self.dictum_channel_index >= len(self.dictum_channels):
+            self.dictum_channel_index = 0
 
         for girlfriend in self.girlfriend_list:
             city_name = girlfriend.get('city_name').strip()
@@ -262,7 +285,7 @@ class GFWeather:
                 try:
                     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
                     day_delta = (datetime.now() - start_datetime).days
-                    delta_msg = f'宝贝这是我们在一起的第 {day_delta} 天。\n'
+                    delta_msg = f'蕊宝，这是我们在一起的第 {day_delta} 天。\n'
                 except:
                     delta_msg = ''
             else:
