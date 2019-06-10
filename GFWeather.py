@@ -104,7 +104,9 @@ class GFWeather:
         for _ in range(5):
             # 命令行显示登录二维码
             # itchat.auto_login(enableCmdQR=True)
-            if os.environ.get('MODE') == 'server':
+            mode = os.environ.get('MODE')
+            print("检测环境：", mode)
+            if mode == 'server':
                 itchat.auto_login(enableCmdQR=2)
             else:
                 itchat.auto_login()
@@ -297,7 +299,7 @@ class GFWeather:
 
 if __name__ == '__main__':
     # 直接运行
-    # GFWeather().run()
+    GFWeather().run()
 
     # 只查看获取数据，
     GFWeather().start_today_info(True)
