@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import time
 from datetime import datetime
@@ -105,8 +106,8 @@ class GFWeather:
             # 命令行显示登录二维码
             # itchat.auto_login(enableCmdQR=True)
             mode = os.environ.get('MODE')
-            mode = 'server'
-            print("检测环境：", mode)
+            # mode = 'server'
+            # print("检测环境：", mode)
             if mode == 'server':
                 itchat.auto_login(enableCmdQR=2)
             else:
@@ -145,7 +146,7 @@ class GFWeather:
         scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hours[1], minute=self.alarm_minutes[1])
         scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hours[2], minute=self.alarm_minutes[2])
         # 每隔 30 秒发送一条数据用于测试。
-        scheduler.add_job(self.start_today_info, 'interval', seconds=30)
+        # scheduler.add_job(self.start_today_info, 'interval', seconds=30)
         scheduler.start()
 
     def start_today_info(self, is_test=False):
@@ -287,7 +288,7 @@ class GFWeather:
             if start_date:
                 try:
                     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-                    day_delta = (datetime.now() - start_datetime).days
+                    day_delta = (datetime.now() - start_datetime).days + 1
                     delta_msg = f'蕊宝，这是我们在一起的第 {day_delta} 天。\n'
                 except:
                     delta_msg = ''
