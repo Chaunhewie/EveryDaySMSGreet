@@ -14,7 +14,7 @@ class GFEverydaySMS:
             "qinghua": 'http://api.tianapi.com/txapi/saylove/index?key={0}',
             "sms": 'https://api.binstd.com/sms/send?appkey={0}&mobile={1}&content={2}'}
     # 注意：顺序影响短信编辑
-    zaoan_apis = ["tianqi", "zaoan"]
+    zaoan_apis = ["zaoan", "tianqi"]
     wanan_apis = ["qinghua", "wanan"]
 
     def __init__(self):
