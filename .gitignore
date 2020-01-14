@@ -1,2 +1,4 @@
 .idea
 __pycache__
+phone_number
+*_api_key
