@@ -12,6 +12,9 @@ evening_alarm_timed: '10:30'
 morning_dictum_channel: '天行Life(早安心语 and 天气预报)'
 evening_dictum_channel: '天行Life(晚安心语 and 土味情话)'
 
+# text_emoji_file
+text_emoji_file: 'text_emoji.txt'
+
 # 需要在本目录创建 tx_api_key 文件，并在第一行写入自己的API Key（API Key请前往 https://www.tianapi.com/ 注册获取）
 tx_api_key_file: 'tx_api_key'
 # 需要在本目录创建 bin_std_api_key 文件，并在第一行写入自己的 account_sid，第二行写入自己的 auth_token（API Key请前往 https://www.twilio.com/ 注册获取）
@@ -28,7 +31,7 @@ sms_infos:
     # 从那天开始勾搭的（可空）
     start_date: '2019-12-17'
     # 短信的最后留言（可空）
-    sweet_words: '爱你的小田田（づ￣3￣）づ╭❤～'
+    sweet_words: '爱你的小田田 '
 
 #  - # 如果需要多对情侣，则按照如下格式继续扩展
 #    phone_number_file: 'phone_numer file_name'

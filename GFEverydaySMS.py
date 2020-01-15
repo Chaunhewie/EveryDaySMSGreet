@@ -4,6 +4,7 @@ from datetime import datetime, date
 import requests
 import yaml
 import json
+import random
 
 class GFEverydaySMS:
     weather_types = {"风": 1, "云": 2, "雨": 3, "雪": 4, "霜": 5, "露": 6, "雾": 7, "雷": 8, "晴": 9, "阴": 10,
@@ -18,7 +19,7 @@ class GFEverydaySMS:
     wanan_apis = ["qinghua", "wanan"]
 
     def __init__(self):
-        self.sms_list, self.dictum_channels, self.tx_api_key, self.bin_std_api_key = self.get_init_data()
+        self.sms_list, self.dictum_channels, self.text_emoji_file, self.tx_api_key, self.bin_std_api_key = self.get_init_data()
 
     def get_init_data(self):
         '''
@@ -35,6 +36,10 @@ class GFEverydaySMS:
         evening_dictum_channel = config.get('evening_dictum_channel', '')
         dictum_channels = [morning_dictum_channel, evening_dictum_channel]
         init_msg += f"信息获取渠道：早-{morning_dictum_channel}, 晚-{evening_dictum_channel}\n\n"
+
+        text_emoji_file = config.get('text_emoji_file', '')
+        init_msg += f"text_emoji文件名：{text_emoji_file}\n"
+
 
         sms_list = []
         sms_infos = config.get('sms_infos')
@@ -77,7 +82,7 @@ class GFEverydaySMS:
         print(u"*" * 25 + "init msg" + u"*" * 25)
         print(init_msg)
 
-        return sms_list, dictum_channels, tx_api_key, bin_std_api_key
+        return sms_list, dictum_channels, text_emoji_file, tx_api_key, bin_std_api_key
 
     def start_today_info(self, chat_id, send_test=False):
         '''
@@ -110,6 +115,7 @@ class GFEverydaySMS:
                     url = self.urls[k].format(self.tx_api_key)
                 sms_msg += self.get_url_info(url, k, "./cache/" + k + "/" + date_str + ".txt")
             sms_msg += sms['sweet_words']
+            sms_msg += self.get_text_emoji()
             # 发送短信
             if len(sms["phone_numbers"]) <= 0:
                 print("No Phone Number with msg:", sms_msg)
@@ -170,6 +176,19 @@ class GFEverydaySMS:
             msg = c["content"] + "\n"
         return msg
 
+    def get_text_emoji(self):
+        '''
+        随机获取一个 text emoji 作为结束标记
+        :return: str text_emoji
+        '''
+        text_emoji = []
+        with open(self.text_emoji_file, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+        for line in lines:
+            if len(line) > 0:
+                text_emoji.append(line)
+        return random.choice(text_emoji)
+        
     def send_sms_with_url(self, url):
         print("*" * 10 + "sending sms" + "*" * 10)
         resp = requests.get(url)
